@@ -1,0 +1,164 @@
+<!-- =========================================================
+FILE 2 : register.html
+========================================================= -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register IoT Project</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }
+
+    body{
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background:linear-gradient(135deg,#11998e,#38ef7d);
+    }
+
+    .container{
+      width:350px;
+      background:white;
+      padding:30px;
+      border-radius:15px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    h2{
+      text-align:center;
+      margin-bottom:25px;
+      color:#11998e;
+    }
+
+    .input-group{
+      margin-bottom:15px;
+    }
+
+    .input-group label{
+      display:block;
+      margin-bottom:5px;
+      font-weight:bold;
+    }
+
+    .input-group input{
+      width:100%;
+      padding:12px;
+      border:1px solid #ccc;
+      border-radius:8px;
+    }
+
+    button{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:8px;
+      background:#11998e;
+      color:white;
+      font-size:16px;
+      cursor:pointer;
+    }
+
+    button:hover{
+      background:#0d7f6f;
+    }
+
+    .link{
+      text-align:center;
+      margin-top:15px;
+    }
+
+    .link a{
+      text-decoration:none;
+      color:#11998e;
+      font-weight:bold;
+    }
+
+    .message{
+      text-align:center;
+      margin-top:10px;
+      color:red;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <h2>Register Account</h2>
+
+    <div class="input-group">
+      <label>Email</label>
+      <input type="email" id="registerEmail">
+    </div>
+
+    <div class="input-group">
+      <label>Password</label>
+      <input type="password" id="registerPassword">
+    </div>
+
+    <button onclick="register()">Register</button>
+
+    <div class="link">
+      Sudah punya akun?
+      <a href="index.html">Login</a>
+    </div>
+
+    <div class="message" id="registerMessage"></div>
+
+  </div>
+
+  <script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+    import {
+      getAuth,
+      createUserWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "API_KEY",
+      authDomain: "PROJECT_ID.firebaseapp.com",
+      projectId: "PROJECT_ID",
+      storageBucket: "PROJECT_ID.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.register = function(){
+
+      const email = document.getElementById("registerEmail").value;
+      const password = document.getElementById("registerPassword").value;
+
+      createUserWithEmailAndPassword(auth, email, password)
+      .then(() => {
+
+        alert("Register berhasil");
+        window.location.href = "index.html";
+
+      })
+      .catch((error) => {
+
+        document.getElementById("registerMessage").innerHTML =
+        error.message;
+
+      });
+    }
+
+  </script>
+
+</body>
+</html>
