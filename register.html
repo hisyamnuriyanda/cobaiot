@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register IoT Project</title>
+  <title>Register IoT</title>
 
   <style>
 
@@ -64,10 +64,6 @@
       cursor:pointer;
     }
 
-    button:hover{
-      background:#0d7f6f;
-    }
-
     .link{
       text-align:center;
       margin-top:15px;
@@ -116,43 +112,56 @@
 
   <script type="module">
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
     import {
       getAuth,
       createUserWithEmailAndPassword
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
- apiKey: "AIzaSyARjdNZCCneCczefxSZ-sMDmNwzBITt93A",
-  authDomain: "cobaiot-210cc.firebaseapp.com",
-  projectId: "cobaiot-210cc",
-  storageBucket: "cobaiot-210cc.firebasestorage.app",
-  messagingSenderId: "839944267290",
-  appId: "1:839944267290:web:14c33e950e30032abd13a3",
+
+      apiKey: "AIzaSyARjdNZCCneCczefxSZ-sMDmNwzBITt93A",
+      authDomain: "cobaiot-210cc.firebaseapp.com",
+      projectId: "cobaiot-210cc",
+      storageBucket: "cobaiot-210cc.firebasestorage.app",
+      messagingSenderId: "839944267290",
+      appId: "1:839944267290:web:14c33e950e30032abd13a3"
+
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    window.register = function(){
+    window.register = async function(){
 
-      const email = document.getElementById("registerEmail").value;
-      const password = document.getElementById("registerPassword").value;
+      const email =
+      document.getElementById("registerEmail").value;
 
-      createUserWithEmailAndPassword(auth, email, password)
-      .then(() => {
+      const password =
+      document.getElementById("registerPassword").value;
+
+      try{
+
+        await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
 
         alert("Register berhasil");
+
         window.location.href = "index.html";
 
-      })
-      .catch((error) => {
+      }catch(error){
 
-        document.getElementById("registerMessage").innerHTML =
-        error.message;
+        document.getElementById("registerMessage")
+        .innerHTML = error.message;
 
-      });
+      }
+
     }
 
   </script>
