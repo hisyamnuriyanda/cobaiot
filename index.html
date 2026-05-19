@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>IoT Project - Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login IoT</title>
 
   <style>
+
     *{
       margin:0;
       padding:0;
       box-sizing:border-box;
-      font-family: Arial, sans-serif;
+      font-family:Arial, sans-serif;
     }
 
     body{
@@ -29,7 +30,7 @@
       box-shadow:0 10px 25px rgba(0,0,0,0.2);
     }
 
-    .container h2{
+    h2{
       text-align:center;
       margin-bottom:25px;
       color:#1e3c72;
@@ -50,7 +51,6 @@
       padding:12px;
       border:1px solid #ccc;
       border-radius:8px;
-      outline:none;
     }
 
     button{
@@ -62,7 +62,6 @@
       color:white;
       font-size:16px;
       cursor:pointer;
-      transition:0.3s;
     }
 
     button:hover{
@@ -75,8 +74,8 @@
     }
 
     .link a{
-      color:#1e3c72;
       text-decoration:none;
+      color:#1e3c72;
       font-weight:bold;
     }
 
@@ -85,21 +84,23 @@
       margin-top:10px;
       color:red;
     }
+
   </style>
 </head>
 <body>
 
   <div class="container">
+
     <h2>Login IoT Project</h2>
 
     <div class="input-group">
       <label>Email</label>
-      <input type="email" id="loginEmail" placeholder="Masukkan email">
+      <input type="email" id="loginEmail">
     </div>
 
     <div class="input-group">
       <label>Password</label>
-      <input type="password" id="loginPassword" placeholder="Masukkan password">
+      <input type="password" id="loginPassword">
     </div>
 
     <button onclick="login()">Login</button>
@@ -110,49 +111,72 @@
     </div>
 
     <div class="message" id="loginMessage"></div>
+
   </div>
 
-  <!-- Firebase -->
   <script type="module">
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
     import {
       getAuth,
-      signInWithEmailAndPassword
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      signInWithEmailAndPassword,
+      onAuthStateChanged
+    }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    // CONFIG FIREBASE
     const firebaseConfig = {
-  apiKey: "AIzaSyARjdNZCCneCczefxSZ-sMDmNwzBITt93A",
-  authDomain: "cobaiot-210cc.firebaseapp.com",
-  projectId: "cobaiot-210cc",
-  storageBucket: "cobaiot-210cc.firebasestorage.app",
-  messagingSenderId: "839944267290",
-  appId: "1:839944267290:web:14c33e950e30032abd13a3",
+
+      apiKey: "AIzaSyARjdNZCCneCczefxSZ-sMDmNwzBITt93A",
+      authDomain: "cobaiot-210cc.firebaseapp.com",
+      projectId: "cobaiot-210cc",
+      storageBucket: "cobaiot-210cc.firebasestorage.app",
+      messagingSenderId: "839944267290",
+      appId: "1:839944267290:web:14c33e950e30032abd13a3"
+
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    window.login = function(){
+    onAuthStateChanged(auth, (user)=>{
 
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
+      if(user){
 
-      signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
-
-        alert("Login berhasil");
         window.location.href = "dashboard.html";
 
-      })
-      .catch((error) => {
+      }
 
-        document.getElementById("loginMessage").innerHTML =
-        error.message;
+    });
 
-      });
+    window.login = async function(){
+
+      const email =
+      document.getElementById("loginEmail").value;
+
+      const password =
+      document.getElementById("loginPassword").value;
+
+      try{
+
+        await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+        alert("Login berhasil");
+
+        window.location.href = "dashboard.html";
+
+      }catch(error){
+
+        document.getElementById("loginMessage")
+        .innerHTML = error.message;
+
+      }
+
     }
 
   </script>
