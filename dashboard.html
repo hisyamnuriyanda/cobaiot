@@ -1,441 +1,193 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-
-  <meta charset="UTF-8">
-
-  <meta name="viewport"
-  content="width=device-width, initial-scale=1.0">
-
-  <title>Dashboard IoT</title>
-
-  <style>
-
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:Arial,sans-serif;
-    }
-
-    body{
-      background:#f4f7fc;
-    }
-
-    /* ================= NAVBAR ================= */
-
-    .navbar{
-
-      width:100%;
-
-      background:#1e293b;
-
-      color:white;
-
-      padding:20px;
-
-      display:flex;
-
-      justify-content:space-between;
-
-      align-items:center;
-
-      box-shadow:0 2px 10px rgba(0,0,0,0.1);
-
-    }
-
-    .navbar h2{
-
-      font-size:24px;
-
-    }
-
-    .navbar button{
-
-      padding:10px 20px;
-
-      border:none;
-
-      border-radius:8px;
-
-      background:red;
-
-      color:white;
-
-      cursor:pointer;
-
-      font-weight:bold;
-
-      transition:0.3s;
-
-    }
-
-    .navbar button:hover{
-
-      background:darkred;
-
-    }
-
-    /* ================= CONTAINER ================= */
-
-    .container{
-
-      padding:30px;
-
-    }
-
-    .cards{
-
-      display:grid;
-
-      grid-template-columns:
-      repeat(auto-fit,minmax(250px,1fr));
-
-      gap:20px;
-
-    }
-
-    .card{
-
-      background:white;
-
-      padding:25px;
-
-      border-radius:15px;
-
-      box-shadow:0 5px 15px rgba(0,0,0,0.1);
-
-      transition:0.3s;
-
-    }
-
-    .card:hover{
-
-      transform:translateY(-5px);
-
-    }
-
-    .card h3{
-
-      margin-bottom:15px;
-
-      color:#64748b;
-
-      font-size:18px;
-
-    }
-
-    .card p{
-
-      font-size:32px;
-
-      font-weight:bold;
-
-      color:#0f172a;
-
-    }
-
-    /* ================= STATUS COLOR ================= */
-
-    .normal{
-
-      color:green;
-
-    }
-
-    .ringan{
-
-      color:orange;
-
-    }
-
-    .berat{
-
-      color:red;
-
-    }
-
-    .offline{
-
-      color:red;
-
-    }
-
-    .online{
-
-      color:green;
-
-    }
-
-  </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Admin IoT Stress Detection</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#f4f7fc;
+}
+
+.navbar{
+  width:100%;
+  background:#1e293b;
+  color:white;
+  padding:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.navbar button{
+  padding:10px 20px;
+  border:none;
+  border-radius:8px;
+  background:red;
+  color:white;
+  cursor:pointer;
+}
+
+.container{
+  padding:30px;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+}
+
+.card{
+  background:white;
+  padding:25px;
+  border-radius:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card h3{
+  margin-bottom:15px;
+}
+
+.card p{
+  font-size:32px;
+  font-weight:bold;
+}
+
+.form-card input{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border:1px solid #ccc;
+  border-radius:8px;
+}
+
+.save-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+}
+
+.table-container{
+  margin-top:30px;
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  border:1px solid #ddd;
+  padding:10px;
+  text-align:center;
+}
+
+th{
+  background:#1e293b;
+  color:white;
+}
+
+.normal{color:green;}
+.ringan{color:orange;}
+.berat{color:red;}
+.online{color:green;}
+.offline{color:red;}
+</style>
 </head>
 
 <body>
 
-  <!-- ================= NAVBAR ================= -->
-
-  <div class="navbar">
-
-    <h2>Dashboard IoT Stress Detection</h2>
-
-    <button onclick="logout()">
-      Logout
-    </button>
-
-  </div>
-
-  <!-- ================= CONTENT ================= -->
-
-  <div class="container">
-
-    <div class="cards">
-
-      <!-- HRV -->
-
-      <div class="card">
-
-        <h3>Heart Rate Variability</h3>
-
-        <p id="hrv">
-          0 ms
-        </p>
-
-      </div>
-
-      <!-- GSR -->
-
-      <div class="card">
-
-        <h3>EDA / GSR Sensor</h3>
-
-        <p id="gsr">
-          0 uS
-        </p>
-
-      </div>
-
-      <!-- STATUS -->
-
-      <div class="card">
-
-        <h3>Stress Level</h3>
-
-        <p id="status">
-          -
-        </p>
-
-      </div>
-
-      <!-- DEVICE -->
-
-      <div class="card">
-
-        <h3>Device Status</h3>
-
-        <p id="device">
-          OFFLINE
-        </p>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- ================= FIREBASE ================= -->
-
-  <script type="module">
-
-    // ============== FIREBASE APP ==============
-
-    import {
-      initializeApp
-    }
-    from
-    "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-    // ============== FIREBASE AUTH ==============
-
-    import {
-
-      getAuth,
-
-      onAuthStateChanged,
-
-      signOut
-
-    }
-    from
-    "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    // ============== FIREBASE DATABASE ==============
-
-    import {
-
-      getDatabase,
-
-      ref,
-
-      onValue
-
-    }
-    from
-    "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    // ============== FIREBASE CONFIG ==============
-
-    const firebaseConfig = {
-
-      apiKey:
-      "AIzaSyARjdNZCCneCczefxSZ-sMDmNwzBITt93A",
-
-      authDomain:
-      "cobaiot-210cc.firebaseapp.com",
-
-      databaseURL:
-      "https://cobaiot-210cc-default-rtdb.firebaseio.com",
-
-      projectId:
-      "cobaiot-210cc",
-
-      storageBucket:
-      "cobaiot-210cc.firebasestorage.app",
-
-      messagingSenderId:
-      "839944267290",
-
-      appId:
-      "1:839944267290:web:14c33e950e30032abd13a3"
-
-    };
-
-    // ============== INIT FIREBASE ==============
-
-    const app = initializeApp(firebaseConfig);
-
-    const auth = getAuth(app);
-
-    const db = getDatabase(app);
-
-    // ============== LOGIN CHECK ==============
-
-    onAuthStateChanged(auth, (user)=>{
-
-      if(!user){
-
-        window.location.href = "index.html";
-
-      }
-
-    });
-
-    // ============== HRV ==============
-
-    const hrvRef = ref(db, "iot/hrv");
-
-    onValue(hrvRef, (snapshot)=>{
-
-      const data = snapshot.val();
-
-      document.getElementById("hrv")
-      .innerHTML = data + " ms";
-
-    });
-
-    // ============== GSR ==============
-
-    const gsrRef = ref(db, "iot/gsr");
-
-    onValue(gsrRef, (snapshot)=>{
-
-      const data = snapshot.val();
-
-      document.getElementById("gsr")
-      .innerHTML = data + " uS";
-
-    });
-
-    // ============== STATUS ==============
-
-    const statusRef = ref(db, "iot/status");
-
-    onValue(statusRef, (snapshot)=>{
-
-      const data = snapshot.val();
-
-      const statusElement =
-      document.getElementById("status");
-
-      statusElement.innerHTML = data;
-
-      statusElement.className = "";
-
-      if(data == "NORMAL"){
-
-        statusElement.classList.add("normal");
-
-      }
-
-      else if(data == "STRES RINGAN"){
-
-        statusElement.classList.add("ringan");
-
-      }
-
-      else if(data == "STRES BERAT"){
-
-        statusElement.classList.add("berat");
-
-      }
-
-    });
-
-    // ============== DEVICE ==============
-
-    const deviceRef = ref(db, "iot/device");
-
-    onValue(deviceRef, (snapshot)=>{
-
-      const data = snapshot.val();
-
-      const deviceElement =
-      document.getElementById("device");
-
-      deviceElement.innerHTML = data;
-
-      deviceElement.className = "";
-
-      if(data == "ONLINE"){
-
-        deviceElement.classList.add("online");
-
-      } else {
-
-        deviceElement.classList.add("offline");
-
-      }
-
-    });
-
-    // ============== LOGOUT ==============
-
-    window.logout = function(){
-
-      signOut(auth)
-
-      .then(()=>{
-
-        alert("Logout berhasil");
-
-        window.location.href =
-        "index.html";
-
-      });
-
-    }
-
-  </script>
+<div class="navbar">
+  <h2>Dashboard Admin IoT Stress Detection</h2>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+
+<div class="cards">
+
+<div class="card form-card">
+<h3>Data Responden</h3>
+
+<input type="text" id="nama" placeholder="Nama Mahasiswa">
+<input type="number" id="umur" placeholder="Umur">
+<input type="number" id="semester" placeholder="Semester">
+
+<button class="save-btn" onclick="simpanData()">
+Simpan Data
+</button>
+</div>
+
+<div class="card">
+<h3>Heart Rate Variability</h3>
+<p id="hrv">0 ms</p>
+</div>
+
+<div class="card">
+<h3>EDA / GSR Sensor</h3>
+<p id="gsr">0 uS</p>
+</div>
+
+<div class="card">
+<h3>Stress Level</h3>
+<p id="status">-</p>
+</div>
+
+<div class="card">
+<h3>Device Status</h3>
+<p id="device">OFFLINE</p>
+</div>
+
+</div>
+
+<div class="table-container">
+
+<h3>Riwayat Pengukuran</h3>
+
+<table>
+<thead>
+<tr>
+<th>Nama</th>
+<th>Umur</th>
+<th>Semester</th>
+<th>HRV</th>
+<th>EDA</th>
+<th>Status</th>
+<th>Waktu</th>
+</tr>
+</thead>
+
+<tbody id="historyTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<!-- GANTI SCRIPT FIREBASE DENGAN MILIK ANDA -->
+<script type="module">
+// Tempel script Firebase Anda di sini.
+// Struktur dashboard sudah siap untuk Opsi A.
+</script>
 
 </body>
 </html>
