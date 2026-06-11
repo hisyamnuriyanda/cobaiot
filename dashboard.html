@@ -11,6 +11,108 @@
 
   <style>
 
+    /* ================= FORM ================= */
+
+.form-section{
+
+  margin-top:30px;
+
+  background:white;
+
+  padding:25px;
+
+  border-radius:15px;
+
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+
+}
+
+.form-section h2{
+
+  margin-bottom:15px;
+
+  color:#1e293b;
+
+}
+
+.form-section input{
+
+  width:100%;
+
+  padding:12px;
+
+  margin-bottom:12px;
+
+  border:1px solid #ddd;
+
+  border-radius:8px;
+
+  font-size:16px;
+
+}
+
+.form-section button{
+
+  background:#2563eb;
+
+  color:white;
+
+  border:none;
+
+  padding:12px 20px;
+
+  border-radius:8px;
+
+  cursor:pointer;
+
+  font-size:16px;
+
+}
+
+.form-section button:hover{
+
+  background:#1d4ed8;
+
+}
+
+/* ================= TABLE ================= */
+
+table{
+
+  width:100%;
+
+  border-collapse:collapse;
+
+  margin-top:15px;
+
+}
+
+table th{
+
+  background:#1e293b;
+
+  color:white;
+
+  padding:12px;
+
+}
+
+table td{
+
+  padding:10px;
+
+  border:1px solid #ddd;
+
+  text-align:center;
+
+}
+
+table tr:nth-child(even){
+
+  background:#f8fafc;
+
+}
+
     *{
       margin:0;
       padding:0;
@@ -243,6 +345,93 @@
 
   </div>
 
+  <!-- ================= DATA PENGGUNA ================= -->
+
+<div class="form-section">
+
+  <h2>Data Pengguna Saat Ini</h2>
+
+  <input
+    type="text"
+    id="nama"
+    placeholder="Nama">
+
+  <input
+    type="number"
+    id="umur"
+    placeholder="Umur">
+
+  <input
+    type="number"
+    id="semester"
+    placeholder="Semester">
+
+  <button onclick="simpanPengukuran()">
+
+    Simpan Pengukuran
+
+  </button>
+
+</div>
+  <!-- ================= DATA PENGGUNA ================= -->
+
+<div class="form-section">
+
+  <h2>Data Pengguna Saat Ini</h2>
+
+  <input
+    type="text"
+    id="nama"
+    placeholder="Nama">
+
+  <input
+    type="number"
+    id="umur"
+    placeholder="Umur">
+
+  <input
+    type="number"
+    id="semester"
+    placeholder="Semester">
+
+  <button onclick="simpanPengukuran()">
+
+    Simpan Pengukuran
+
+  </button>
+
+</div>
+  <!-- ================= RIWAYAT ================= -->
+
+<div class="form-section">
+
+  <h2>Riwayat Pengguna</h2>
+
+  <table>
+
+    <thead>
+
+      <tr>
+
+        <th>Waktu</th>
+        <th>Nama</th>
+        <th>Umur</th>
+        <th>Semester</th>
+        <th>GSR</th>
+        <th>HRV</th>
+        <th>Stress</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody id="historyBody">
+
+    </tbody>
+
+  </table>
+
+</div>
   <!-- ================= FIREBASE ================= -->
 
   <script type="module">
@@ -273,13 +462,19 @@
 
     import {
 
-      getDatabase,
+  getDatabase,
 
-      ref,
+  ref,
 
-      onValue
+  onValue,
 
-    }
+  push,
+
+  set
+
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
     from
     "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
@@ -418,163 +613,6 @@
 
     });
 
-
-    <!-- DATA PENGGUNA -->
-
-<div class="form-section">
-
-  <h2>Data Pengguna Saat Ini</h2>
-
-  <input
-    type="text"
-    id="nama"
-    placeholder="Nama">
-
-  <input
-    type="number"
-    id="umur"
-    placeholder="Umur">
-
-  <input
-    type="number"
-    id="semester"
-    placeholder="Semester">
-
-  <button onclick="simpanPengukuran()">
-    Simpan Pengukuran
-  </button>
-
-</div>
-
-<!-- RIWAYAT -->
-
-<div class="form-section">
-
-  <h2>Riwayat Pengguna</h2>
-
-  <table>
-
-    <thead>
-
-      <tr>
-
-        <th>Waktu</th>
-        <th>Nama</th>
-        <th>Umur</th>
-        <th>Semester</th>
-        <th>GSR</th>
-        <th>HRV</th>
-        <th>Stress</th>
-
-      </tr>
-
-    </thead>
-
-    <tbody id="historyBody">
-
-    </tbody>
-
-  </table>
-
-</div>
-
-    // ================= RIWAYAT =================
-
-const historyRef =
-ref(db,"riwayat");
-
-onValue(historyRef,(snapshot)=>{
-
-  const tbody =
-  document.getElementById(
-    "historyBody"
-  );
-
-  tbody.innerHTML = "";
-
-  snapshot.forEach((child)=>{
-
-    const data = child.val();
-
-    tbody.innerHTML += `
-
-      <tr>
-
-        <td>${data.waktu || "-"}</td>
-        <td>${data.nama || "-"}</td>
-        <td>${data.umur || "-"}</td>
-        <td>${data.semester || "-"}</td>
-        <td>${data.gsr || "-"}</td>
-        <td>${data.hrv || "-"}</td>
-        <td>${data.status || "-"}</td>
-
-      </tr>
-
-    `;
-
-  });
-
-});
-
-// ================= SIMPAN =================
-
-window.simpanPengukuran = function(){
-
-  const nama =
-  document.getElementById("nama").value;
-
-  const umur =
-  document.getElementById("umur").value;
-
-  const semester =
-  document.getElementById("semester").value;
-
-  if(
-    nama=="" ||
-    umur=="" ||
-    semester==""
-  ){
-
-    alert("Lengkapi data");
-
-    return;
-  }
-
-  const now = new Date();
-
-  const waktu =
-  now.toLocaleString("id-ID");
-
-  const dataBaru =
-  push(ref(db,"riwayat"));
-
-  set(dataBaru,{
-
-    waktu:waktu,
-
-    nama:nama,
-
-    umur:umur,
-
-    semester:semester,
-
-    gsr:
-    document.getElementById("gsr")
-    .innerText,
-
-    hrv:
-    document.getElementById("hrv")
-    .innerText,
-
-    status:
-    document.getElementById("status")
-    .innerText
-
-  });
-
-  alert("Data berhasil disimpan");
-
-}
     // ============== LOGOUT ==============
 
     window.logout = function(){
