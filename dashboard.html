@@ -445,8 +445,6 @@ table tr:nth-child(even){
 }
 from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    from
-    "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     // ============== FIREBASE CONFIG ==============
 
@@ -583,6 +581,86 @@ from
 
     });
 
+    // ================= RIWAYAT =================
+
+const historyRef = ref(db,"riwayat");
+
+onValue(historyRef,(snapshot)=>{
+
+  const tbody =
+  document.getElementById("historyBody");
+
+  tbody.innerHTML = "";
+
+  snapshot.forEach((child)=>{
+
+    const data = child.val();
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${data.waktu || "-"}</td>
+        <td>${data.nama || "-"}</td>
+        <td>${data.umur || "-"}</td>
+        <td>${data.semester || "-"}</td>
+        <td>${data.gsr || "-"}</td>
+        <td>${data.hrv || "-"}</td>
+        <td>${data.status || "-"}</td>
+      </tr>
+    `;
+
+  });
+
+});
+
+
+// ================= SIMPAN =================
+
+window.simpanPengukuran = function(){
+
+  const nama =
+  document.getElementById("nama").value;
+
+  const umur =
+  document.getElementById("umur").value;
+
+  const semester =
+  document.getElementById("semester").value;
+
+  if(!nama || !umur || !semester){
+
+    alert("Lengkapi data");
+
+    return;
+
+  }
+
+  const waktu =
+  new Date().toLocaleString("id-ID");
+
+  const dataBaru =
+  push(ref(db,"riwayat"));
+
+  set(dataBaru,{
+
+    waktu:waktu,
+
+    nama:nama,
+
+    umur:umur,
+
+    semester:semester,
+
+    gsr:document.getElementById("gsr").innerText,
+
+    hrv:document.getElementById("hrv").innerText,
+
+    status:document.getElementById("status").innerText
+
+  });
+
+  alert("Data berhasil disimpan");
+
+}
     // ============== LOGOUT ==============
 
     window.logout = function(){
