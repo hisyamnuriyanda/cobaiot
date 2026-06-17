@@ -1,802 +1,432 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-
   <meta charset="UTF-8">
-
-  <meta name="viewport"
-  content="width=device-width, initial-scale=1.0">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard IoT</title>
-
   <style>
-
-    /* ================= FORM ================= */
-
-.form-section{
-
-  margin-top:30px;
-
-  background:white;
-
-  padding:25px;
-
-  border-radius:15px;
-
-  box-shadow:0 5px 15px rgba(0,0,0,0.1);
-
-}
-
-.form-section h2{
-
-  margin-bottom:15px;
-
-  color:#1e293b;
-
-}
-
-.form-section input{
-
-  width:100%;
-
-  padding:12px;
-
-  margin-bottom:12px;
-
-  border:1px solid #ddd;
-
-  border-radius:8px;
-
-  font-size:16px;
-
-}
-
-.form-section button{
-
-  background:#2563eb;
-
-  color:white;
-
-  border:none;
-
-  padding:12px 20px;
-
-  border-radius:8px;
-
-  cursor:pointer;
-
-  font-size:16px;
-
-}
-
-.form-section button:hover{
-
-  background:#1d4ed8;
-
-}
-
-/* ================= TABLE ================= */
-
-table{
-
-  width:100%;
-
-  border-collapse:collapse;
-
-  margin-top:15px;
-
-}
-
-table th{
-
-  background:#1e293b;
-
-  color:white;
-
-  padding:12px;
-
-}
-
-table td{
-
-  padding:10px;
-
-  border:1px solid #ddd;
-
-  text-align:center;
-
-}
-
-table tr:nth-child(even){
-
-  background:#f8fafc;
-
-}
-
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:Arial,sans-serif;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
     }
 
-    body{
-      background:#f4f7fc;
+    body {
+      background: #f4f7fc;
     }
 
     /* ================= NAVBAR ================= */
-
-    .navbar{
-
-      width:100%;
-
-      background:#1e293b;
-
-      color:white;
-
-      padding:20px;
-
-      display:flex;
-
-      justify-content:space-between;
-
-      align-items:center;
-
-      box-shadow:0 2px 10px rgba(0,0,0,0.1);
-
+    .navbar {
+      width: 100%;
+      background: #1e293b;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
-    .navbar h2{
-
-      font-size:24px;
-
+    .navbar h2 {
+      font-size: 24px;
     }
 
-    .navbar button{
-
-      padding:10px 20px;
-
-      border:none;
-
-      border-radius:8px;
-
-      background:red;
-
-      color:white;
-
-      cursor:pointer;
-
-      font-weight:bold;
-
-      transition:0.3s;
-
+    .navbar button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: red;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
     }
 
-    .navbar button:hover{
-
-      background:darkred;
-
+    .navbar button:hover {
+      background: darkred;
     }
 
     /* ================= CONTAINER ================= */
-
-    .container{
-
-      padding:30px;
-
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 30px;
     }
 
-    .cards{
-
-      display:grid;
-
-      grid-template-columns:
-      repeat(auto-fit,minmax(250px,1fr));
-
-      gap:20px;
-
+    /* ================= CARDS ================= */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
     }
 
-    .card{
-
-      background:white;
-
-      padding:25px;
-
-      border-radius:15px;
-
-      box-shadow:0 5px 15px rgba(0,0,0,0.1);
-
-      transition:0.3s;
-
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: 0.3s;
     }
 
-    .card:hover{
-
-      transform:translateY(-5px);
-
+    .card:hover {
+      transform: translateY(-5px);
     }
 
-    .card h3{
-
-      margin-bottom:15px;
-
-      color:#64748b;
-
-      font-size:18px;
-
+    .card h3 {
+      margin-bottom: 15px;
+      color: #64748b;
+      font-size: 18px;
     }
 
-    .card p{
-
-      font-size:32px;
-
-      font-weight:bold;
-
-      color:#0f172a;
-
+    .card p {
+      font-size: 32px;
+      font-weight: bold;
+      color: #0f172a;
     }
 
     /* ================= STATUS COLOR ================= */
+    .normal  { color: green; }
+    .ringan  { color: orange; }
+    .berat   { color: red; }
+    .offline { color: red; }
+    .online  { color: green; }
 
-    .normal{
-
-      color:green;
-
+    /* ================= FORM ================= */
+    .form-section {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
     }
 
-    .ringan{
-
-      color:orange;
-
+    .form-section h2 {
+      margin-bottom: 15px;
+      color: #1e293b;
     }
 
-    .berat{
-
-      color:red;
-
+    .form-section input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
     }
 
-    .offline{
-
-      color:red;
-
+    .form-section button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
     }
 
-    .online{
-
-      color:green;
-
+    .form-section button:hover {
+      background: #1d4ed8;
     }
-        /* ================= MOBILE RESPONSIVE ================= */
 
-.container{
-  max-width:1200px;
-  margin:auto;
-}
+    /* ================= TABLE ================= */
+    .table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
-.form-section{
-  max-width:1200px;
-  margin:20px auto;
-}
-/* Agar tabel bisa discroll horizontal */
-table-wrapper{
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      min-width: 600px;
+    }
 
-@media (max-width:768px){
+    table th {
+      background: #1e293b;
+      color: white;
+      padding: 12px;
+    }
 
-  .navbar{
-    flex-direction:column;
-    gap:12px;
-    text-align:center;
-    padding:15px;
-  }
+    table td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
 
-  .navbar h2{
-    font-size:18px;
-    line-height:1.4;
-  }
+    table tr:nth-child(even) {
+      background: #f8fafc;
+    }
 
-  .navbar button{
-    width:100%;
-    max-width:200px;
-  }
+    /* ================= MOBILE RESPONSIVE ================= */
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        padding: 15px;
+      }
 
-  .container{
-    padding:15px;
-  }
+      .navbar h2 {
+        font-size: 18px;
+        line-height: 1.4;
+      }
 
-  .cards{
-    grid-template-columns:1fr;
-    gap:15px;
-  }
+      .navbar button {
+        width: 100%;
+        max-width: 200px;
+      }
 
-  .card{
-    padding:20px;
-  }
+      .container {
+        padding: 15px;
+      }
 
-  .card h3{
-    font-size:15px;
-  }
+      .cards {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
 
-  .card p{
-    font-size:24px;
-  }
+      .card {
+        padding: 20px;
+      }
 
-  .form-section{
-    margin:15px;
-    padding:18px;
-  }
+      .card h3 {
+        font-size: 15px;
+      }
 
-  .form-section h2{
-    font-size:18px;
-  }
+      .card p {
+        font-size: 24px;
+      }
 
-  .form-section input{
-    font-size:16px;
-    padding:12px;
-  }
+      .form-section {
+        padding: 18px;
+      }
 
-  .form-section button{
-    width:100%;
-    padding:14px;
-    font-size:16px;
-  }
+      .form-section h2 {
+        font-size: 18px;
+      }
 
-  table{
-    min-width:700px;
-  }
+      .form-section input {
+        font-size: 16px;
+        padding: 12px;
+      }
 
-  table th,
-  table td{
-    font-size:13px;
-    padding:8px;
-    white-space:nowrap;
-  }
-}
+      .form-section button {
+        width: 100%;
+        padding: 14px;
+        font-size: 16px;
+      }
 
-/* HP sangat kecil */
-@media (max-width:480px){
+      table th,
+      table td {
+        font-size: 13px;
+        padding: 8px;
+        white-space: nowrap;
+      }
+    }
 
-  .navbar h2{
-    font-size:16px;
-  }
+    @media (max-width: 480px) {
+      .navbar h2 {
+        font-size: 16px;
+      }
 
-  .card p{
-    font-size:22px;
-  }
+      .card p {
+        font-size: 22px;
+      }
 
-  .form-section{
-    padding:15px;
-  }
-}
-
+      .form-section {
+        padding: 15px;
+      }
+    }
   </style>
-
 </head>
-
 <body>
 
   <!-- ================= NAVBAR ================= -->
-
   <div class="navbar">
-
     <h2>Dashboard IoT Stress Detection</h2>
-
-    <button onclick="logout()">
-      Logout
-    </button>
-
+    <button onclick="logout()">Logout</button>
   </div>
 
   <!-- ================= CONTENT ================= -->
-<div class="container">
+  <div class="container">
 
-  <div class="cards">
-  </div>
-
-  <div class="form-section">
-  </div>
-
-  <div class="form-section">
-  </div>
-
-</div>
+    <!-- ===== CARDS ===== -->
+    <div class="cards">
 
       <!-- HRV -->
-
       <div class="card">
-
         <h3>Heart Rate Variability</h3>
-
-        <p id="hrv">
-          0 ms
-        </p>
-
+        <p id="hrv">0 ms</p>
       </div>
 
       <!-- GSR -->
-
       <div class="card">
-
         <h3>EDA / GSR Sensor</h3>
-
-        <p id="gsr">
-          0 uS
-        </p>
-
+        <p id="gsr">0 uS</p>
       </div>
 
       <!-- STATUS -->
-
       <div class="card">
-
         <h3>Stress Level</h3>
-
-        <p id="status">
-          -
-        </p>
-
+        <p id="status">-</p>
       </div>
 
       <!-- DEVICE -->
-
       <div class="card">
-
         <h3>Device Status</h3>
-
-        <p id="device">
-          OFFLINE
-        </p>
-
+        <p id="device">OFFLINE</p>
       </div>
 
     </div>
 
-  </div>
+    <!-- ===== DATA PENGGUNA ===== -->
+    <div class="form-section">
+      <h2>Data Pengguna Saat Ini</h2>
 
-  <!-- ================= DATA PENGGUNA ================= -->
+      <input type="text"   id="nama"     placeholder="Nama">
+      <input type="number" id="umur"     placeholder="Umur">
+      <input type="number" id="semester" placeholder="Semester">
 
-<div class="form-section">
+      <button onclick="simpanPengukuran()">Simpan Pengukuran</button>
+    </div>
 
-  <h2>Data Pengguna Saat Ini</h2>
+    <!-- ===== RIWAYAT ===== -->
+    <div class="form-section">
+      <h2>Riwayat Pengguna</h2>
 
-  <input
-    type="text"
-    id="nama"
-    placeholder="Nama">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>Nama</th>
+              <th>Umur</th>
+              <th>Semester</th>
+              <th>GSR</th>
+              <th>HRV</th>
+              <th>Stress</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
 
-  <input
-    type="number"
-    id="umur"
-    placeholder="Umur">
+  </div><!-- /container -->
 
-  <input
-    type="number"
-    id="semester"
-    placeholder="Semester">
-
-  <button onclick="simpanPengukuran()">
-
-    Simpan Pengukuran
-
-  </button>
-  <!-- ================= RIWAYAT ================= -->
-
-  <button onclick="simpanPengukuran()">
-    Simpan Pengukuran
-  </button>
-
-</div>
-
-<div class="form-section">
-
-  <h2>Riwayat Pengguna</h2>
-
-  <table>
-
-    <thead>
-
-      <tr>
-
-        <th>Waktu</th>
-        <th>Nama</th>
-        <th>Umur</th>
-        <th>Semester</th>
-        <th>GSR</th>
-        <th>HRV</th>
-        <th>Stress</th>
-
-      </tr>
-
-    </thead>
-
-    <tbody id="historyBody">
-
-    </tbody>
-
-  </table>
-
-</div>
   <!-- ================= FIREBASE ================= -->
-
   <script type="module">
 
-    // ============== FIREBASE APP ==============
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-    import {
-      initializeApp
-    }
-    from
-    "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    // ============== FIREBASE AUTH ==============
-
-    import {
-
-      getAuth,
-
-      onAuthStateChanged,
-
-      signOut
-
-    }
-    from
-    "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    // ============== FIREBASE DATABASE ==============
-
-    import {
-
-  getDatabase,
-
-  ref,
-
-  onValue,
-
-  push,
-
-  set
-
-}
-from
-"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    // ============== FIREBASE CONFIG ==============
+    import { getDatabase, ref, onValue, push, set }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
-
-      apiKey:
-      "AIzaSyARjdNZCCneCczefxSZ-sMDmNwzBITt93A",
-
-      authDomain:
-      "cobaiot-210cc.firebaseapp.com",
-
-      databaseURL:
-      "https://cobaiot-210cc-default-rtdb.firebaseio.com",
-
-      projectId:
-      "cobaiot-210cc",
-
-      storageBucket:
-      "cobaiot-210cc.firebasestorage.app",
-
-      messagingSenderId:
-      "839944267290",
-
-      appId:
-      "1:839944267290:web:14c33e950e30032abd13a3"
-
+      apiKey:            "AIzaSyARjdNZCCneCczefxSZ-sMDmNwzBITt93A",
+      authDomain:        "cobaiot-210cc.firebaseapp.com",
+      databaseURL:       "https://cobaiot-210cc-default-rtdb.firebaseio.com",
+      projectId:         "cobaiot-210cc",
+      storageBucket:     "cobaiot-210cc.firebasestorage.app",
+      messagingSenderId: "839944267290",
+      appId:             "1:839944267290:web:14c33e950e30032abd13a3"
     };
 
-    // ============== INIT FIREBASE ==============
-
-    const app = initializeApp(firebaseConfig);
-
+    const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db   = getDatabase(app);
 
-    const db = getDatabase(app);
-
-    // ============== LOGIN CHECK ==============
-
-    onAuthStateChanged(auth, (user)=>{
-
-      if(!user){
-
-        window.location.href = "index.html";
-
-      }
-
+    // ── Auth check ──────────────────────────────────────────────
+    onAuthStateChanged(auth, (user) => {
+      if (!user) window.location.href = "index.html";
     });
 
-    // ============== HRV ==============
-
-    const hrvRef = ref(db, "iot/hrv");
-
-    onValue(hrvRef, (snapshot)=>{
-
-      const data = snapshot.val();
-
-      document.getElementById("hrv")
-      .innerHTML = data + " ms";
-
+    // ── HRV ─────────────────────────────────────────────────────
+    onValue(ref(db, "iot/hrv"), (snap) => {
+      document.getElementById("hrv").textContent = snap.val() + " ms";
     });
 
-    // ============== GSR ==============
-
-    const gsrRef = ref(db, "iot/gsr");
-
-    onValue(gsrRef, (snapshot)=>{
-
-      const data = snapshot.val();
-
-      document.getElementById("gsr")
-      .innerHTML = data + " uS";
-
+    // ── GSR ─────────────────────────────────────────────────────
+    onValue(ref(db, "iot/gsr"), (snap) => {
+      document.getElementById("gsr").textContent = snap.val() + " uS";
     });
 
-    // ============== STATUS ==============
-
-    const statusRef = ref(db, "iot/status");
-
-    onValue(statusRef, (snapshot)=>{
-
-      const data = snapshot.val();
-
-      const statusElement =
-      document.getElementById("status");
-
-      statusElement.innerHTML = data;
-
-      statusElement.className = "";
-
-      if(data == "NORMAL"){
-
-        statusElement.classList.add("normal");
-
-      }
-
-      else if(data == "STRES RINGAN"){
-
-        statusElement.classList.add("ringan");
-
-      }
-
-      else if(data == "STRES BERAT"){
-
-        statusElement.classList.add("berat");
-
-      }
-
+    // ── Status ──────────────────────────────────────────────────
+    onValue(ref(db, "iot/status"), (snap) => {
+      const data = snap.val();
+      const el   = document.getElementById("status");
+      el.textContent = data;
+      el.className   = "";
+      if      (data === "NORMAL")      el.classList.add("normal");
+      else if (data === "STRES RINGAN") el.classList.add("ringan");
+      else if (data === "STRES BERAT")  el.classList.add("berat");
     });
 
-    // ============== DEVICE ==============
-
-    const deviceRef = ref(db, "iot/device");
-
-    onValue(deviceRef, (snapshot)=>{
-
-      const data = snapshot.val();
-
-      const deviceElement =
-      document.getElementById("device");
-
-      deviceElement.innerHTML = data;
-
-      deviceElement.className = "";
-
-      if(data == "ONLINE"){
-
-        deviceElement.classList.add("online");
-
-      } else {
-
-        deviceElement.classList.add("offline");
-
-      }
-
+    // ── Device ──────────────────────────────────────────────────
+    onValue(ref(db, "iot/device"), (snap) => {
+      const data = snap.val();
+      const el   = document.getElementById("device");
+      el.textContent = data;
+      el.className   = data === "ONLINE" ? "online" : "offline";
     });
 
-    // ================= RIWAYAT =================
+    // ── Riwayat ─────────────────────────────────────────────────
+    onValue(ref(db, "riwayat"), (snap) => {
+      const tbody = document.getElementById("historyBody");
+      tbody.innerHTML = "";
+      snap.forEach((child) => {
+        const d = child.val();
+        tbody.innerHTML += `
+          <tr>
+            <td>${d.waktu    || "-"}</td>
+            <td>${d.nama     || "-"}</td>
+            <td>${d.umur     || "-"}</td>
+            <td>${d.semester || "-"}</td>
+            <td>${d.gsr      || "-"}</td>
+            <td>${d.hrv      || "-"}</td>
+            <td>${d.status   || "-"}</td>
+          </tr>`;
+      });
+    });
 
-const historyRef = ref(db,"riwayat");
+    // ── Simpan ──────────────────────────────────────────────────
+    window.simpanPengukuran = function () {
+      const nama     = document.getElementById("nama").value.trim();
+      const umur     = document.getElementById("umur").value.trim();
+      const semester = document.getElementById("semester").value.trim();
 
-onValue(historyRef,(snapshot)=>{
+      if (!nama || !umur || !semester) {
+        alert("Lengkapi data terlebih dahulu");
+        return;
+      }
 
-  const tbody =
-  document.getElementById("historyBody");
-
-  tbody.innerHTML = "";
-
-  snapshot.forEach((child)=>{
-
-    const data = child.val();
-
-    tbody.innerHTML += `
-      <tr>
-        <td>${data.waktu || "-"}</td>
-        <td>${data.nama || "-"}</td>
-        <td>${data.umur || "-"}</td>
-        <td>${data.semester || "-"}</td>
-        <td>${data.gsr || "-"}</td>
-        <td>${data.hrv || "-"}</td>
-        <td>${data.status || "-"}</td>
-      </tr>
-    `;
-
-  });
-
-});
-
-
-// ================= SIMPAN =================
-
-window.simpanPengukuran = function(){
-
-  const nama =
-  document.getElementById("nama").value;
-
-  const umur =
-  document.getElementById("umur").value;
-
-  const semester =
-  document.getElementById("semester").value;
-
-  if(!nama || !umur || !semester){
-
-    alert("Lengkapi data");
-
-    return;
-
-  }
-
-  const waktu =
-  new Date().toLocaleString("id-ID");
-
-  const dataBaru =
-  push(ref(db,"riwayat"));
-
-  set(dataBaru,{
-
-    waktu:waktu,
-
-    nama:nama,
-
-    umur:umur,
-
-    semester:semester,
-
-    gsr:document.getElementById("gsr").innerText,
-
-    hrv:document.getElementById("hrv").innerText,
-
-    status:document.getElementById("status").innerText
-
-  });
-
-  alert("Data berhasil disimpan");
-
-}
-    // ============== LOGOUT ==============
-
-    window.logout = function(){
-
-      signOut(auth)
-
-      .then(()=>{
-
-        alert("Logout berhasil");
-
-        window.location.href =
-        "index.html";
-
+      set(push(ref(db, "riwayat")), {
+        waktu:    new Date().toLocaleString("id-ID"),
+        nama,
+        umur,
+        semester,
+        gsr:    document.getElementById("gsr").textContent,
+        hrv:    document.getElementById("hrv").textContent,
+        status: document.getElementById("status").textContent
       });
 
-    }
+      alert("Data berhasil disimpan");
+    };
+
+    // ── Logout ──────────────────────────────────────────────────
+    window.logout = function () {
+      signOut(auth).then(() => {
+        alert("Logout berhasil");
+        window.location.href = "index.html";
+      });
+    };
 
   </script>
-
 </body>
 </html>
