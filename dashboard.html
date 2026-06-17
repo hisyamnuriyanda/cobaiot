@@ -280,23 +280,9 @@ table tr:nth-child(even){
   margin:20px auto;
 }
 /* Agar tabel bisa discroll horizontal */
-<div class="table-wrapper">
-
-<table>
-
--webkit-overflow-scrolling:touch;
-
-</table>
-
-</div>
-<div class="table-wrapper">
-
-<table>
-
--webkit-overflow-scrolling:touch;
-
-</table>
-  
+table-wrapper{
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
 }
 
 @media (max-width:768px){
