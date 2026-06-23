@@ -130,6 +130,36 @@
       background: #1d4ed8;
     }
 
+    /* ================= RIWAYAT HEADER ================= */
+    .riwayat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .riwayat-header h2 {
+      margin-bottom: 0;
+    }
+
+    .btn-hapus-semua {
+      background: #dc2626 !important;
+      color: white;
+      border: none;
+      padding: 10px 18px !important;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px !important;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .btn-hapus-semua:hover {
+      background: #b91c1c !important;
+    }
+
     /* ================= TABLE ================= */
     .table-wrapper {
       overflow-x: auto;
@@ -139,8 +169,8 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
-      min-width: 600px;
+      margin-top: 5px;
+      min-width: 680px;
     }
 
     table th {
@@ -157,6 +187,30 @@
 
     table tr:nth-child(even) {
       background: #f8fafc;
+    }
+
+    /* ================= TOMBOL HAPUS BARIS ================= */
+    .btn-hapus {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .btn-hapus:hover {
+      background: #b91c1c;
+    }
+
+    /* ================= EMPTY STATE ================= */
+    .empty-row td {
+      color: #94a3b8;
+      font-style: italic;
+      padding: 20px;
     }
 
     /* ================= MOBILE RESPONSIVE ================= */
@@ -216,6 +270,18 @@
         width: 100%;
         padding: 14px;
         font-size: 16px;
+      }
+
+      .btn-hapus-semua {
+        width: 100%;
+        text-align: center;
+        padding: 12px !important;
+        font-size: 15px !important;
+      }
+
+      .riwayat-header {
+        flex-direction: column;
+        align-items: flex-start;
       }
 
       table th,
@@ -294,7 +360,10 @@
 
     <!-- ===== RIWAYAT ===== -->
     <div class="form-section">
-      <h2>Riwayat Pengguna</h2>
+      <div class="riwayat-header">
+        <h2>Riwayat Pengguna</h2>
+        <button class="btn-hapus-semua" onclick="hapusSemua()">🗑 Hapus Semua</button>
+      </div>
 
       <div class="table-wrapper">
         <table>
@@ -307,6 +376,7 @@
               <th>GSR</th>
               <th>HRV</th>
               <th>Stress</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody id="historyBody"></tbody>
@@ -325,7 +395,7 @@
     import { getAuth, onAuthStateChanged, signOut }
       from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    import { getDatabase, ref, onValue, push, set }
+    import { getDatabase, ref, onValue, push, set, remove }
       from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
@@ -363,7 +433,7 @@
       const el   = document.getElementById("status");
       el.textContent = data;
       el.className   = "";
-      if      (data === "NORMAL")      el.classList.add("normal");
+      if      (data === "NORMAL")       el.classList.add("normal");
       else if (data === "STRES RINGAN") el.classList.add("ringan");
       else if (data === "STRES BERAT")  el.classList.add("berat");
     });
@@ -380,8 +450,18 @@
     onValue(ref(db, "riwayat"), (snap) => {
       const tbody = document.getElementById("historyBody");
       tbody.innerHTML = "";
+
+      if (!snap.exists()) {
+        tbody.innerHTML = `
+          <tr class="empty-row">
+            <td colspan="8">Belum ada riwayat pengukuran.</td>
+          </tr>`;
+        return;
+      }
+
       snap.forEach((child) => {
-        const d = child.val();
+        const d   = child.val();
+        const key = child.key;
         tbody.innerHTML += `
           <tr>
             <td>${d.waktu    || "-"}</td>
@@ -391,6 +471,9 @@
             <td>${d.gsr      || "-"}</td>
             <td>${d.hrv      || "-"}</td>
             <td>${d.status   || "-"}</td>
+            <td>
+              <button class="btn-hapus" onclick="hapusSatu('${key}')">Hapus</button>
+            </td>
           </tr>`;
       });
     });
@@ -417,6 +500,22 @@
       });
 
       alert("Data berhasil disimpan");
+    };
+
+    // ── Hapus Satu Baris ─────────────────────────────────────────
+    window.hapusSatu = function (key) {
+      if (!confirm("Hapus data ini?")) return;
+      remove(ref(db, "riwayat/" + key))
+        .then(() => alert("Data berhasil dihapus"))
+        .catch(() => alert("Gagal menghapus data"));
+    };
+
+    // ── Hapus Semua ──────────────────────────────────────────────
+    window.hapusSemua = function () {
+      if (!confirm("Hapus SEMUA riwayat pengguna? Tindakan ini tidak dapat dibatalkan.")) return;
+      remove(ref(db, "riwayat"))
+        .then(() => alert("Semua riwayat berhasil dihapus"))
+        .catch(() => alert("Gagal menghapus semua riwayat"));
     };
 
     // ── Logout ──────────────────────────────────────────────────
