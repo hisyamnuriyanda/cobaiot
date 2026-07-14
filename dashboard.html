@@ -144,6 +144,12 @@
       margin-bottom: 0;
     }
 
+    .riwayat-header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .btn-hapus-semua {
       background: #dc2626 !important;
       color: white;
@@ -158,6 +164,22 @@
 
     .btn-hapus-semua:hover {
       background: #b91c1c !important;
+    }
+
+    .btn-download-excel {
+      background: #16a34a !important;
+      color: white;
+      border: none;
+      padding: 10px 18px !important;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px !important;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .btn-download-excel:hover {
+      background: #15803d !important;
     }
 
     /* ================= TABLE ================= */
@@ -272,7 +294,13 @@
         font-size: 16px;
       }
 
-      .btn-hapus-semua {
+      .riwayat-header-actions {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .btn-hapus-semua,
+      .btn-download-excel {
         width: 100%;
         text-align: center;
         padding: 12px !important;
@@ -362,11 +390,14 @@
     <div class="form-section">
       <div class="riwayat-header">
         <h2>Riwayat Pengguna</h2>
-        <button class="btn-hapus-semua" onclick="hapusSemua()">🗑 Hapus Semua</button>
+        <div class="riwayat-header-actions">
+          <button class="btn-download-excel" onclick="downloadExcel()">⬇ Download Excel</button>
+          <button class="btn-hapus-semua" onclick="hapusSemua()">🗑 Hapus Semua</button>
+        </div>
       </div>
 
       <div class="table-wrapper">
-        <table>
+        <table id="tabelRiwayat">
           <thead>
             <tr>
               <th>Waktu</th>
@@ -385,6 +416,9 @@
     </div>
 
   </div><!-- /container -->
+
+  <!-- ================= SHEETJS (untuk export Excel) ================= -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <!-- ================= FIREBASE ================= -->
   <script type="module">
@@ -411,6 +445,9 @@
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db   = getDatabase(app);
+
+    // ── Simpan data riwayat di memori untuk kebutuhan export Excel ─
+    let riwayatData = [];
 
     // ── Auth check ──────────────────────────────────────────────
     onAuthStateChanged(auth, (user) => {
@@ -450,6 +487,7 @@
     onValue(ref(db, "riwayat"), (snap) => {
       const tbody = document.getElementById("historyBody");
       tbody.innerHTML = "";
+      riwayatData = [];
 
       if (!snap.exists()) {
         tbody.innerHTML = `
@@ -462,6 +500,18 @@
       snap.forEach((child) => {
         const d   = child.val();
         const key = child.key;
+
+        // simpan untuk export excel
+        riwayatData.push({
+          Waktu:    d.waktu    || "-",
+          Nama:     d.nama     || "-",
+          Umur:     d.umur     || "-",
+          Semester: d.semester || "-",
+          GSR:      d.gsr      || "-",
+          HRV:      d.hrv      || "-",
+          Stress:   d.status   || "-"
+        });
+
         tbody.innerHTML += `
           <tr>
             <td>${d.waktu    || "-"}</td>
@@ -516,6 +566,33 @@
       remove(ref(db, "riwayat"))
         .then(() => alert("Semua riwayat berhasil dihapus"))
         .catch(() => alert("Gagal menghapus semua riwayat"));
+    };
+
+    // ── Download Excel ─────────────────────────────────────────
+    window.downloadExcel = function () {
+      if (!riwayatData || riwayatData.length === 0) {
+        alert("Tidak ada data riwayat untuk diunduh");
+        return;
+      }
+
+      const ws = XLSX.utils.json_to_sheet(riwayatData);
+
+      // Lebar kolom otomatis biar rapi
+      ws["!cols"] = [
+        { wch: 20 }, // Waktu
+        { wch: 18 }, // Nama
+        { wch: 8 },  // Umur
+        { wch: 10 }, // Semester
+        { wch: 12 }, // GSR
+        { wch: 14 }, // HRV
+        { wch: 15 }  // Stress
+      ];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Riwayat Pengguna");
+
+      const tanggal = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `riwayat-pengguna-${tanggal}.xlsx`);
     };
 
     // ── Logout ──────────────────────────────────────────────────
