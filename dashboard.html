@@ -86,6 +86,16 @@
       color: #0f172a;
     }
 
+    .card-sub {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: #f1f5f9;
+    }
+
     /* ================= STATUS COLOR ================= */
     .normal  { color: green; }
     .ringan  { color: orange; }
@@ -353,12 +363,14 @@
       <div class="card">
         <h3>Heart Rate Variability</h3>
         <p id="hrv">0 ms</p>
+        <span id="hrvLabel" class="card-sub">-</span>
       </div>
 
       <!-- GSR -->
       <div class="card">
         <h3>EDA / GSR Sensor</h3>
         <p id="gsr">0 uS</p>
+        <span id="gsrLabel" class="card-sub">-</span>
       </div>
 
       <!-- STATUS -->
@@ -407,6 +419,7 @@
               <th>GSR</th>
               <th>HRV</th>
               <th>Stress</th>
+              <th>Skor</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -449,6 +462,39 @@
     // ── Simpan data riwayat di memori untuk kebutuhan export Excel ─
     let riwayatData = [];
 
+    // ── Klasifikasi Skor (mengikuti logika firmware) ──────────────
+    function klasifikasiRMSSD(rmssd) {
+      if (rmssd > 35)       return { skor: 0, label: "Normal",       kelas: "normal" };
+      else if (rmssd >= 22) return { skor: 1, label: "Stres Ringan", kelas: "ringan" };
+      else                  return { skor: 2, label: "Stres Berat",  kelas: "berat"  };
+    }
+
+    function klasifikasiGSR(gsr) {
+      if (gsr < 4)       return { skor: 0, label: "Normal",       kelas: "normal" };
+      else if (gsr <= 6) return { skor: 1, label: "Stres Ringan", kelas: "ringan" };
+      else               return { skor: 2, label: "Stres Berat",  kelas: "berat"  };
+    }
+
+    // Gabungkan skor HRV & GSR jadi status akhir (ambil skor terburuk)
+    function hitungStatusAkhir(rmssd, gsr) {
+      const hasilHRV = klasifikasiRMSSD(rmssd);
+      const hasilGSR = klasifikasiGSR(gsr);
+      const skorAkhir = Math.max(hasilHRV.skor, hasilGSR.skor);
+
+      let label, kelas;
+      if (skorAkhir === 0)      { label = "NORMAL";       kelas = "normal"; }
+      else if (skorAkhir === 1) { label = "STRES RINGAN";  kelas = "ringan"; }
+      else                       { label = "STRES BERAT";   kelas = "berat";  }
+
+      return { skorAkhir, label, kelas, hasilHRV, hasilGSR };
+    }
+
+    // Ambil angka dari string seperti "72.68 ms" atau "1.58145 uS"
+    function ambilAngka(str) {
+      const n = parseFloat(String(str).replace(",", "."));
+      return isNaN(n) ? 0 : n;
+    }
+
     // ── Auth check ──────────────────────────────────────────────
     onAuthStateChanged(auth, (user) => {
       if (!user) window.location.href = "index.html";
@@ -456,12 +502,24 @@
 
     // ── HRV ─────────────────────────────────────────────────────
     onValue(ref(db, "iot/hrv"), (snap) => {
+      const nilai = Number(snap.val());
       document.getElementById("hrv").textContent = snap.val() + " ms";
+
+      const hasil = klasifikasiRMSSD(nilai);
+      const labelEl = document.getElementById("hrvLabel");
+      labelEl.textContent = hasil.label + " (skor " + hasil.skor + ")";
+      labelEl.className = "card-sub " + hasil.kelas;
     });
 
     // ── GSR ─────────────────────────────────────────────────────
     onValue(ref(db, "iot/gsr"), (snap) => {
+      const nilai = Number(snap.val());
       document.getElementById("gsr").textContent = snap.val() + " uS";
+
+      const hasil = klasifikasiGSR(nilai);
+      const labelEl = document.getElementById("gsrLabel");
+      labelEl.textContent = hasil.label + " (skor " + hasil.skor + ")";
+      labelEl.className = "card-sub " + hasil.kelas;
     });
 
     // ── Status ──────────────────────────────────────────────────
@@ -492,7 +550,7 @@
       if (!snap.exists()) {
         tbody.innerHTML = `
           <tr class="empty-row">
-            <td colspan="8">Belum ada riwayat pengukuran.</td>
+            <td colspan="9">Belum ada riwayat pengukuran.</td>
           </tr>`;
         return;
       }
@@ -500,6 +558,9 @@
       snap.forEach((child) => {
         const d   = child.val();
         const key = child.key;
+
+        // hitung ulang skor dari nilai HRV & GSR yang tersimpan
+        const hasil = hitungStatusAkhir(ambilAngka(d.hrv), ambilAngka(d.gsr));
 
         // simpan untuk export excel
         riwayatData.push({
@@ -509,7 +570,8 @@
           Semester: d.semester || "-",
           GSR:      d.gsr      || "-",
           HRV:      d.hrv      || "-",
-          Stress:   d.status   || "-"
+          Stress:   d.status   || "-",
+          Skor:     hasil.skorAkhir
         });
 
         tbody.innerHTML += `
@@ -521,6 +583,7 @@
             <td>${d.gsr      || "-"}</td>
             <td>${d.hrv      || "-"}</td>
             <td>${d.status   || "-"}</td>
+            <td class="${hasil.kelas}">${hasil.skorAkhir}</td>
             <td>
               <button class="btn-hapus" onclick="hapusSatu('${key}')">Hapus</button>
             </td>
@@ -585,7 +648,8 @@
         { wch: 10 }, // Semester
         { wch: 12 }, // GSR
         { wch: 14 }, // HRV
-        { wch: 15 }  // Stress
+        { wch: 15 }, // Stress
+        { wch: 8 }   // Skor
       ];
 
       const wb = XLSX.utils.book_new();
