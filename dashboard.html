@@ -462,29 +462,40 @@
     // ── Simpan data riwayat di memori untuk kebutuhan export Excel ─
     let riwayatData = [];
 
-    // ── Klasifikasi Skor (mengikuti logika firmware) ──────────────
+    // ── Klasifikasi Skor HRV (RMSSD) ───────────────────────────────
+    // >35     = 0 (Normal)
+    // 22 - 35 = 1 (Stres Ringan)
+    // <22     = 2 (Stres Berat)
     function klasifikasiRMSSD(rmssd) {
       if (rmssd > 35)       return { skor: 0, label: "Normal",       kelas: "normal" };
       else if (rmssd >= 22) return { skor: 1, label: "Stres Ringan", kelas: "ringan" };
       else                  return { skor: 2, label: "Stres Berat",  kelas: "berat"  };
     }
 
+    // ── Klasifikasi Skor GSR ────────────────────────────────────────
+    // <4    = 0 (Normal)
+    // 4 - 6 = 1 (Stres Ringan)
+    // >6    = 2 (Stres Berat)
     function klasifikasiGSR(gsr) {
       if (gsr < 4)       return { skor: 0, label: "Normal",       kelas: "normal" };
       else if (gsr <= 6) return { skor: 1, label: "Stres Ringan", kelas: "ringan" };
       else               return { skor: 2, label: "Stres Berat",  kelas: "berat"  };
     }
 
-    // Gabungkan skor HRV & GSR jadi status akhir (ambil skor terburuk)
+    // ── Gabungkan skor HRV & GSR jadi status akhir (penjumlahan, 0-4) ─
+    // Total skor = skor HRV + skor GSR
+    // 0     = Normal
+    // 1 - 2 = Stres Ringan
+    // 3 - 4 = Stres Berat
     function hitungStatusAkhir(rmssd, gsr) {
       const hasilHRV = klasifikasiRMSSD(rmssd);
       const hasilGSR = klasifikasiGSR(gsr);
-      const skorAkhir = Math.max(hasilHRV.skor, hasilGSR.skor);
+      const skorAkhir = hasilHRV.skor + hasilGSR.skor; // 0 - 4
 
       let label, kelas;
-      if (skorAkhir === 0)      { label = "NORMAL";       kelas = "normal"; }
-      else if (skorAkhir === 1) { label = "STRES RINGAN";  kelas = "ringan"; }
-      else                       { label = "STRES BERAT";   kelas = "berat";  }
+      if (skorAkhir === 0)                          { label = "NORMAL";       kelas = "normal"; }
+      else if (skorAkhir === 1 || skorAkhir === 2)  { label = "STRES RINGAN"; kelas = "ringan"; }
+      else                                            { label = "STRES BERAT";  kelas = "berat";  }
 
       return { skorAkhir, label, kelas, hasilHRV, hasilGSR };
     }
@@ -523,6 +534,11 @@
     });
 
     // ── Status ──────────────────────────────────────────────────
+    // Catatan: kartu ini masih membaca nilai "iot/status" langsung dari
+    // Firebase (dikirim oleh firmware). Jika firmware belum memakai
+    // logika penjumlahan skor baru, nilai kartu ini bisa berbeda dari
+    // kolom "Stress" & "Skor" pada tabel Riwayat di bawah, yang sudah
+    // dihitung ulang di sisi dashboard memakai hitungStatusAkhir().
     onValue(ref(db, "iot/status"), (snap) => {
       const data = snap.val();
       const el   = document.getElementById("status");
@@ -570,7 +586,7 @@
           Semester: d.semester || "-",
           GSR:      d.gsr      || "-",
           HRV:      d.hrv      || "-",
-          Stress:   d.status   || "-",
+          Stress:   hasil.label,
           Skor:     hasil.skorAkhir
         });
 
@@ -582,7 +598,7 @@
             <td>${d.semester || "-"}</td>
             <td>${d.gsr      || "-"}</td>
             <td>${d.hrv      || "-"}</td>
-            <td>${d.status   || "-"}</td>
+            <td class="${hasil.kelas}">${hasil.label}</td>
             <td class="${hasil.kelas}">${hasil.skorAkhir}</td>
             <td>
               <button class="btn-hapus" onclick="hapusSatu('${key}')">Hapus</button>
@@ -602,6 +618,12 @@
         return;
       }
 
+      // Hitung ulang status memakai logika penjumlahan skor terbaru,
+      // agar data yang disimpan konsisten dengan tampilan tabel Riwayat.
+      const hrvNilai = ambilAngka(document.getElementById("hrv").textContent);
+      const gsrNilai = ambilAngka(document.getElementById("gsr").textContent);
+      const hasil    = hitungStatusAkhir(hrvNilai, gsrNilai);
+
       set(push(ref(db, "riwayat")), {
         waktu:    new Date().toLocaleString("id-ID"),
         nama,
@@ -609,7 +631,7 @@
         semester,
         gsr:    document.getElementById("gsr").textContent,
         hrv:    document.getElementById("hrv").textContent,
-        status: document.getElementById("status").textContent
+        status: hasil.label
       });
 
       alert("Data berhasil disimpan");
